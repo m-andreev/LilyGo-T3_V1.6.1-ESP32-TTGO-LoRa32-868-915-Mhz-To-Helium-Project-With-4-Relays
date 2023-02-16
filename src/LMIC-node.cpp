@@ -63,6 +63,8 @@ const int RELAY_PIN2 = 14;
 const int RELAY_PIN3 = 4; /// not 2
 const int RELAY_PIN4 = 13;
 
+uint8_t tempArr[5];
+
 const uint8_t payloadBufferLength = 16;    // Adjust to fit max payload length
 
 int downLink = 0;
@@ -792,56 +794,39 @@ void processWork(ostime_t doWorkJobTimeStamp)
 
             uint8_t payloadLength = 10;
             
-            uint8_t tempArr[4];
+            
 
             int Reading1 = digitalRead(RELAY_PIN1); // Reading status of digital Pin
             int Reading2 = digitalRead(RELAY_PIN2); // Reading status of digital Pin
             int Reading3 = digitalRead(RELAY_PIN3); // Reading status of digital Pin
             int Reading4 = digitalRead(RELAY_PIN4); // Reading status of digital Pin
+
             
-            if(Reading1 == 1){
-                tempArr[0] = 1;
-            }else{
-                tempArr[0] = 0;
-            }    
-
-            if(Reading2 == 1){
-                tempArr[1] = 1;
-            }else{
-                tempArr[1] = 0;
-            }
-
-            if(Reading3 == 1){
-                tempArr[2] = 1;
-            }else{
-                tempArr[2] = 0;
-            } 
-
-            if(Reading4 == 1){
-                tempArr[3] = 1;
-            }else{
-                tempArr[3] = 0;
-            }  
-
-            for(int i=0;i<sizeof(tempArr);i++){
-                        payloadBuffer[i] = tempArr[i];
+            tempArr[0] = (Reading1 ? '1' : '0');
+            tempArr[1] = (Reading2 ? '1' : '0');
+            tempArr[2] = (Reading3 ? '1' : '0');
+            tempArr[3] = (Reading4 ? '1' : '0');
+            
+            
+            for(int i=0;i<sizeof(tempArr)-1;i++){
+                        payloadBuffer[i] = (uint8_t)tempArr[i];
                     }
 
-            for(int i=0;i<sizeof(tempArr);i++){
-                        Serial.print(tempArr[i]);
+            for(int i=0;i<sizeof(tempArr)-1;i++){
+                        Serial.print((char)tempArr[i]);
                     }
             Serial.println();
 
-            for(int i=0;i<sizeof(tempArr);i++){
+            for(int i=0;i<sizeof(tempArr)-1;i++){
                         Serial.print("Relay ");
                         Serial.print(i+1);
                         Serial.print(" : ");
-                        Serial.print(payloadBuffer[i]);
+                        Serial.print((char)payloadBuffer[i]);
                         Serial.println();
                     }
             Serial.println();
             downLink = 0;   
-            scheduleUplink(fPort, payloadBuffer, sizeof(tempArr));
+            scheduleUplink(fPort, payloadBuffer, sizeof(tempArr)-1);
 
         }
     }
@@ -1008,6 +993,7 @@ void setup()
 //  █ █ █▀▀ █▀▀ █▀▄   █▀▀ █▀█ █▀▄ █▀▀   █▀▄ █▀▀ █▀▀ ▀█▀ █▀█
 //  █ █ ▀▀█ █▀▀ █▀▄   █   █ █ █ █ █▀▀   █▀▄ █▀▀ █ █  █  █ █
 //  ▀▀▀ ▀▀▀ ▀▀▀ ▀ ▀   ▀▀▀ ▀▀▀ ▀▀  ▀▀▀   ▀▀  ▀▀▀ ▀▀▀ ▀▀▀ ▀ ▀
+    Serial.begin(115200);
 
     // Place code for initializing sensors etc. here.
     pinMode(RELAY_PIN1, OUTPUT);
