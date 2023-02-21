@@ -863,7 +863,105 @@ void processDownlink(ostime_t txCompleteTimestamp, uint8_t fPort, uint8_t* data,
     //31->ON 30->OFF
     //41->ON 40->OFF
 
-   
+    if (fPort == cmdPort && dataLength == 1)
+    {
+        switch(data[0]){
+            case '8':
+            digitalWrite(RELAY_PIN1, LOW); //11->ON 10->OFF
+            digitalWrite(RELAY_PIN2, LOW); //21->ON 20->OFF
+            digitalWrite(RELAY_PIN3, LOW); //31->ON 30->OFF
+            digitalWrite(RELAY_PIN4, LOW); //41->ON 40->OFF
+            Serial.println("All relays successfully turned off (LOW).");
+        break;
+            case '9':
+            digitalWrite(RELAY_PIN1, HIGH); //11->ON 10->OFF
+            digitalWrite(RELAY_PIN2, HIGH); //21->ON 20->OFF
+            digitalWrite(RELAY_PIN3, HIGH); //31->ON 30->OFF
+            digitalWrite(RELAY_PIN4, HIGH); //41->ON 40->OFF
+            Serial.println("All relays successfully activated (HIGH).");
+        }
+    }
+
+    if (fPort == cmdPort && dataLength == 2)
+    {
+       char* tempVariable = (char*) data;
+        switch (tempVariable[0])
+        {
+            case '1':
+                if (tempVariable[1] == '1')
+                {
+                    digitalWrite(RELAY_PIN1, HIGH);
+                    Serial.println("Relay 1 turned ON.");
+                }
+                else if (tempVariable[1] == '0')
+                {
+                    digitalWrite(RELAY_PIN1, LOW);
+                    Serial.println("Relay 1 turned OFF.");
+                }
+                else
+                {
+                    Serial.println("Unknown command received.");
+                }
+                break;
+
+            case '2':
+                if (tempVariable[1] == '1')
+                {
+                    digitalWrite(RELAY_PIN2, HIGH);
+                    Serial.println("Relay 2 turned ON.");
+                }
+                else if (tempVariable[1] == '0')
+                {
+                    digitalWrite(RELAY_PIN2, LOW);
+                    Serial.println("Relay 2 turned OFF.");
+                }
+                else
+                {
+                    Serial.println("Unknown command received.");
+                }
+                break;
+
+            case '3':
+                if (tempVariable[1] == '1')
+                {
+                    digitalWrite(RELAY_PIN3, HIGH);
+                    Serial.println("Relay 3 turned ON.");
+                }
+                else if (tempVariable[1] == '0')
+                {
+                    digitalWrite(RELAY_PIN3, LOW);
+                    Serial.println("Relay 3 turned OFF.");
+                }
+                else
+                {
+                    Serial.println("Unknown command received.");
+                }
+                break;
+
+            case '4':
+                if (tempVariable[1] == '1')
+                {
+                    digitalWrite(RELAY_PIN4, HIGH);
+                    Serial.println("Relay 4 turned ON.");
+                }
+                else if (tempVariable[1] == '0')
+                {
+                    digitalWrite(RELAY_PIN4, LOW);
+                    Serial.println("Relay 4 turned OFF.");
+                }
+                else
+                {
+                    Serial.println("Unknown command received.");
+                }
+                break;
+
+            default:
+                Serial.println("Unknown command received.");
+                break;
+        }
+    }    
+
+   /*
     if (fPort == cmdPort && dataLength == 1 && data[0] == '8')
     {
         digitalWrite(RELAY_PIN1, LOW); //11->ON 10->OFF
@@ -945,7 +1043,7 @@ void processDownlink(ostime_t txCompleteTimestamp, uint8_t fPort, uint8_t* data,
         Serial.println("Relay 4 is set to OFF - (40)");
         digitalWrite(RELAY_PIN4, LOW); //41->ON 40->OFF
     }  
-    
+    */
                       
 }
 
