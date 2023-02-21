@@ -881,170 +881,55 @@ void processDownlink(ostime_t txCompleteTimestamp, uint8_t fPort, uint8_t* data,
             Serial.println("All relays successfully activated (HIGH).");
         }
     }
-
+    
+   
+     // Check if data has a size of 2
     if (fPort == cmdPort && dataLength == 2)
     {
-       char* tempVariable = (char*) data;
-        switch (tempVariable[0])
+        // Combine the two bytes into a single variable
+        uint16_t combinedData = ((data[0] - '0') * 10 ) + (data[1] - '0');
+
+        switch (combinedData)
         {
-            case '1':
-                if (tempVariable[1] == '1')
-                {
-                    digitalWrite(RELAY_PIN1, HIGH);
-                    Serial.println("Relay 1 turned ON.");
-                }
-                else if (tempVariable[1] == '0')
-                {
-                    digitalWrite(RELAY_PIN1, LOW);
-                    Serial.println("Relay 1 turned OFF.");
-                }
-                else
-                {
-                    Serial.println("Unknown command received.");
-                }
+            case 11:
+                digitalWrite(RELAY_PIN1, HIGH);
+                Serial.println("Relay 1 turned ON.");
                 break;
-
-            case '2':
-                if (tempVariable[1] == '1')
-                {
-                    digitalWrite(RELAY_PIN2, HIGH);
-                    Serial.println("Relay 2 turned ON.");
-                }
-                else if (tempVariable[1] == '0')
-                {
-                    digitalWrite(RELAY_PIN2, LOW);
-                    Serial.println("Relay 2 turned OFF.");
-                }
-                else
-                {
-                    Serial.println("Unknown command received.");
-                }
+            case 10:
+                digitalWrite(RELAY_PIN1, LOW);
+                Serial.println("Relay 1 turned OFF.");
                 break;
-
-            case '3':
-                if (tempVariable[1] == '1')
-                {
-                    digitalWrite(RELAY_PIN3, HIGH);
-                    Serial.println("Relay 3 turned ON.");
-                }
-                else if (tempVariable[1] == '0')
-                {
-                    digitalWrite(RELAY_PIN3, LOW);
-                    Serial.println("Relay 3 turned OFF.");
-                }
-                else
-                {
-                    Serial.println("Unknown command received.");
-                }
+            case 21:
+                digitalWrite(RELAY_PIN2, HIGH);
+                Serial.println("Relay 2 turned ON.");
                 break;
-
-            case '4':
-                if (tempVariable[1] == '1')
-                {
-                    digitalWrite(RELAY_PIN4, HIGH);
-                    Serial.println("Relay 4 turned ON.");
-                }
-                else if (tempVariable[1] == '0')
-                {
-                    digitalWrite(RELAY_PIN4, LOW);
-                    Serial.println("Relay 4 turned OFF.");
-                }
-                else
-                {
-                    Serial.println("Unknown command received.");
-                }
+            case 20:
+                digitalWrite(RELAY_PIN2, LOW);
+                Serial.println("Relay 2 turned OFF.");
                 break;
-
+            case 31:
+                digitalWrite(RELAY_PIN3, HIGH);
+                Serial.println("Relay 3 turned ON.");
+                break;
+            case 30:
+                digitalWrite(RELAY_PIN3, LOW);
+                Serial.println("Relay 3 turned OFF.");
+                break;
+            case 41:
+                digitalWrite(RELAY_PIN4, HIGH);
+                Serial.println("Relay 4 turned ON.");
+                break;
+            case 40:
+                digitalWrite(RELAY_PIN4, LOW);
+                Serial.println("Relay 4 turned OFF.");
+                break;
             default:
                 Serial.println("Unknown command received.");
                 break;
         }
-    }    
+    }
 
-   /*
-    if (fPort == cmdPort && dataLength == 1 && data[0] == '8')
-    {
-        digitalWrite(RELAY_PIN1, LOW); //11->ON 10->OFF
-        digitalWrite(RELAY_PIN2, LOW); //21->ON 20->OFF
-        digitalWrite(RELAY_PIN3, LOW); //31->ON 30->OFF
-        digitalWrite(RELAY_PIN4, LOW); //41->ON 40->OFF
-        Serial.println("All relays successfully turned off (LOW).");
-        downLink = 0;
-    }  
-    
-    if (fPort == cmdPort && dataLength == 1 && data[0] == '9')
-    {
-        digitalWrite(RELAY_PIN1, HIGH); //11->ON 10->OFF
-        digitalWrite(RELAY_PIN2, HIGH); //21->ON 20->OFF
-        digitalWrite(RELAY_PIN3, HIGH); //31->ON 30->OFF
-        digitalWrite(RELAY_PIN4, HIGH); //41->ON 40->OFF
-        Serial.println("All relays successfully activated (HIGH).");
-        downLink = 0;
-    }  
-    
-    ////Relay 1
-    if (fPort == cmdPort && dataLength == 2 && data[0] == '1' && data[1] == '1')
-    {
-        //New code
-        Serial.println("Relay 1 is set to ON - (11)");
-        digitalWrite(RELAY_PIN1, HIGH); //11->ON 10->OFF
-    }  
-
-     if (fPort == cmdPort && dataLength == 2 && data[0] == '1' && data[1] == '0')
-    {
-        //New code
-        Serial.println("Relay 1 is set to OFF - (10)");
-        digitalWrite(RELAY_PIN1, LOW); //11->ON 10->OFF
-    }  
-
-    
-    ///Relay 2
-    if (fPort == cmdPort && dataLength == 2 && data[0] == '2' && data[1] == '1')
-    {
-        //New code
-        Serial.println("Relay 2 is set to ON - (21)");
-        digitalWrite(RELAY_PIN2, HIGH); //21->ON 20->OFF
-    }  
-
-     if (fPort == cmdPort && dataLength == 2 && data[0] == '2' && data[1] == '0')
-    {
-        //New code
-        Serial.println("Relay 2 is set to OFF - (20)");
-        digitalWrite(RELAY_PIN2, LOW); //21->ON 20->OFF
-    }  
-    
-    ///Relay 3
-    if (fPort == cmdPort && dataLength == 2 && data[0] == '3' && data[1] == '1')
-    {
-        //New code
-        Serial.println("Relay 3 is set to ON - (31)");
-        digitalWrite(RELAY_PIN3, HIGH); //31->ON 30->OFF
-    }  
-
-     if (fPort == cmdPort && dataLength == 2 && data[0] == '3' && data[1] == '0')
-    {
-        //New code
-        Serial.println("Relay 3 is set to OFF - (30)");
-        digitalWrite(RELAY_PIN3, LOW); //31->ON 30->OFF
-    }  
-    
-
-    ///Relay 4
-    if (fPort == cmdPort && dataLength == 2 && data[0] == '4' && data[1] == '1')
-    {
-        //New code
-        Serial.println("Relay 4 is set to ON - (41)");
-        digitalWrite(RELAY_PIN4, HIGH); //41->ON 40->OFF
-    }  
-
-     if (fPort == cmdPort && dataLength == 2 && data[0] == '4' && data[1] == '0')
-    {
-        //New code
-        Serial.println("Relay 4 is set to OFF - (40)");
-        digitalWrite(RELAY_PIN4, LOW); //41->ON 40->OFF
-    }  
-    */
-                      
+                    
 }
 
 
