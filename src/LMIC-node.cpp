@@ -67,6 +67,8 @@ uint8_t tempArr[5];
 
 const uint8_t payloadBufferLength = 16;    // Adjust to fit max payload length
 
+uint8_t currChar = 0b00000000;
+
 int downLink = 0;
 
 
@@ -794,20 +796,31 @@ void processWork(ostime_t doWorkJobTimeStamp)
 
             uint8_t payloadLength = 10;
             
-            
 
-            int Reading1 = digitalRead(RELAY_PIN1); // Reading status of digital Pin
-            int Reading2 = digitalRead(RELAY_PIN2); // Reading status of digital Pin
-            int Reading3 = digitalRead(RELAY_PIN3); // Reading status of digital Pin
-            int Reading4 = digitalRead(RELAY_PIN4); // Reading status of digital Pin
+            int Reading1 = digitalRead(RELAY_PIN1); // Reading status of digital Pin 128
+            int Reading2 = digitalRead(RELAY_PIN2); // Reading status of digital Pin 64
+            int Reading3 = digitalRead(RELAY_PIN3); // Reading status of digital Pin 32
+            int Reading4 = digitalRead(RELAY_PIN4); // Reading status of digital Pin 16
 
             
             tempArr[0] = (Reading1 ? '1' : '0');
             tempArr[1] = (Reading2 ? '1' : '0');
             tempArr[2] = (Reading3 ? '1' : '0');
             tempArr[3] = (Reading4 ? '1' : '0');
+
             
+             for(int i=0;i<sizeof(tempArr)-1;i++){
+                        Serial.print((char)tempArr[i]);
+                    }
+            Serial.println();
+
+            // Print the current state of the relays
+            Serial.print("Current relay state: ");
+            Serial.println(currChar, BIN);
+
+
             
+            /*
             for(int i=0;i<sizeof(tempArr)-1;i++){
                         payloadBuffer[i] = (uint8_t)tempArr[i];
                     }
@@ -826,7 +839,10 @@ void processWork(ostime_t doWorkJobTimeStamp)
                     }
             Serial.println();
             downLink = 0;   
-            scheduleUplink(fPort, payloadBuffer, sizeof(tempArr)-1);
+            */
+           // scheduleUplink(fPort, payloadBuffer, sizeof(tempArr)-1);
+            payloadBuffer[0] = currChar;
+            scheduleUplink(fPort, payloadBuffer, 1 );
 
         }
     }
@@ -845,6 +861,7 @@ void processDownlink(ostime_t txCompleteTimestamp, uint8_t fPort, uint8_t* data,
 
     const uint8_t cmdPort = 10;
     const uint8_t resetCmd= 0xC0;
+    int reading;
 
     if (fPort == cmdPort && dataLength == 1 && data[0] == resetCmd)
     {
@@ -857,12 +874,70 @@ void processDownlink(ostime_t txCompleteTimestamp, uint8_t fPort, uint8_t* data,
         printEvent(timestamp, "Counter reset", PrintTarget::All, false);
     } 
 
+    // Extract the downlink value
+    uint8_t downlinkValue = data[0];
+
+    // Extract the first 4 digits of the downlink value and the current value of currChar
+    uint8_t downlinkRelayState = downlinkValue & 0b11110000;
+    uint8_t currentRelayState = currChar & 0b11110000;
+
+    if (downlinkRelayState == currentRelayState) {
+    // Toggle the state of the remaining bits in currChar based on the downlink value
+    currChar = downlinkValue | (currChar & 0b00001111);
+    Serial.print("Relay state updated to: ");
+    Serial.println(currChar, BIN);
+
+    // Modify the state of the relays based on the updated currChar value
+    if ((currChar & 0b10000000) != 0) {
+    digitalWrite(RELAY_PIN1, HIGH);
+    Serial.println("Relay 1 turned ON.");
+    } else {
+    digitalWrite(RELAY_PIN1, LOW);
+    Serial.println("Relay 1 turned OFF.");
+     }
+
+    if ((currChar & 0b01000000) != 0) {
+    digitalWrite(RELAY_PIN2, HIGH);
+    Serial.println("Relay 2 turned ON.");
+    } else {
+    digitalWrite(RELAY_PIN2, LOW);
+    Serial.println("Relay 2 turned OFF.");
+     }
+
+    if ((currChar & 0b00100000) != 0) {
+    digitalWrite(RELAY_PIN3, HIGH);
+    Serial.println("Relay 3 turned ON.");
+     } else {
+    digitalWrite(RELAY_PIN3, LOW);
+    Serial.println("Relay 3 turned OFF.");
+    }
+
+    if ((currChar & 0b00010000) != 0) {
+    digitalWrite(RELAY_PIN4, HIGH);
+    Serial.println("Relay 4 turned ON.");
+    } else {
+    digitalWrite(RELAY_PIN4, LOW);
+    Serial.println("Relay 4 turned OFF.");
+     }
+    } else {
+    // Update the state of all the relays based on the downlink value
+    digitalWrite(RELAY_PIN1, (downlinkValue & 0b10000000) != 0);
+    digitalWrite(RELAY_PIN2, (downlinkValue & 0b01000000) != 0);
+    digitalWrite(RELAY_PIN3, (downlinkValue & 0b00100000) != 0);
+    digitalWrite(RELAY_PIN4, (downlinkValue & 0b00010000) != 0);
+
+    currChar = downlinkValue;
+    Serial.print("Relay state updated to: ");
+    Serial.println(currChar, BIN);
+
+    
+
     /////If downlink message is equal to '1' / '2', here are the 2 cases :
     //11->ON 10->OFF
     //21->ON 20->OFF
     //31->ON 30->OFF
     //41->ON 40->OFF
-
+    /*
     if (fPort == cmdPort && dataLength == 1)
     {
         switch(data[0]){
@@ -882,7 +957,6 @@ void processDownlink(ostime_t txCompleteTimestamp, uint8_t fPort, uint8_t* data,
         }
     }
     
-   
      // Check if data has a size of 2
     if (fPort == cmdPort && dataLength == 2)
     {
@@ -927,9 +1001,9 @@ void processDownlink(ostime_t txCompleteTimestamp, uint8_t fPort, uint8_t* data,
                 Serial.println("Unknown command received.");
                 break;
         }
-    }
-
-                    
+        */ 
+    }  
+              
 }
 
 
