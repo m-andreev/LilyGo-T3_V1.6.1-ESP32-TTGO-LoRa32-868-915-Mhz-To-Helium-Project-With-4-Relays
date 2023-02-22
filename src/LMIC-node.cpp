@@ -859,55 +859,8 @@ void processDownlink(ostime_t txCompleteTimestamp, uint8_t fPort, uint8_t *data,
 
         if (downlinkRelayState == currentRelayState)
         {
-            // Toggle the state of the remaining bits in currChar based on the downlink value
-            currChar = downlinkValue | (currChar & 0b00001111);
-            Serial.print("Relay state updated to: ");
+            Serial.print("Relay state is the same : ");
             Serial.println(currChar, BIN);
-
-            // Modify the state of the relays based on the updated currChar value
-            if ((currChar & 0b10000000) != 0)
-            {
-                digitalWrite(RELAY_PIN1, HIGH);
-                Serial.println("Relay 1 turned ON.");
-            }
-            else
-            {
-                digitalWrite(RELAY_PIN1, LOW);
-                Serial.println("Relay 1 turned OFF.");
-            }
-
-            if ((currChar & 0b01000000) != 0)
-            {
-                digitalWrite(RELAY_PIN2, HIGH);
-                Serial.println("Relay 2 turned ON.");
-            }
-            else
-            {
-                digitalWrite(RELAY_PIN2, LOW);
-                Serial.println("Relay 2 turned OFF.");
-            }
-
-            if ((currChar & 0b00100000) != 0)
-            {
-                digitalWrite(RELAY_PIN3, HIGH);
-                Serial.println("Relay 3 turned ON.");
-            }
-            else
-            {
-                digitalWrite(RELAY_PIN3, LOW);
-                Serial.println("Relay 3 turned OFF.");
-            }
-
-            if ((currChar & 0b00010000) != 0)
-            {
-                digitalWrite(RELAY_PIN4, HIGH);
-                Serial.println("Relay 4 turned ON.");
-            }
-            else
-            {
-                digitalWrite(RELAY_PIN4, LOW);
-                Serial.println("Relay 4 turned OFF.");
-            }
         }
         else
         {
