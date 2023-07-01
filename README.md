@@ -1,3 +1,6 @@
+In this project are soldered 4 relays to a LilyGo-T3_V1.6.1 ESP32 TTGO LoRa32 868-815 MHz and all the configuration is connected to the Helium Network. The project is made with LMIC-Node, where the idea is to control and read the relays.
+
+
 This repository contains LMIC-node, an example LoRaWAN application for a node for The Things Network.  
 Get your node quickly up and running with LMIC-node.
 
